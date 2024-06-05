@@ -1,5 +1,9 @@
 app_name = "restaurant1"
+<<<<<<< HEAD
 app_title = "Restaurant"
+=======
+app_title = "Restaurant1"
+>>>>>>> 9b05413 (feat: Initialize App)
 app_publisher = "Hilda Chepkirui"
 app_description = "Simple restaurant management system."
 app_email = "baraiywohilda181@gmail.com"

@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 Restaurant
+=======
+Restaurant1
+>>>>>>> 9b05413 (feat: Initialize App)

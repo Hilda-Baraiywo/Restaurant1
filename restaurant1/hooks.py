@@ -1,9 +1,5 @@
 app_name = "restaurant1"
-<<<<<<< HEAD
-app_title = "Restaurant"
-=======
 app_title = "Restaurant1"
->>>>>>> 9b05413 (feat: Initialize App)
 app_publisher = "Hilda Chepkirui"
 app_description = "Simple restaurant management system."
 app_email = "baraiywohilda181@gmail.com"
@@ -230,4 +226,18 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+
+# Whitelist the method to be called via API
+from frappe import whitelist
+
+@whitelist()
+def create_or_update_invoice(order):
+    # Your function implementation here
+    pass
+
+# Add the function to the __all__ list
+__all__ = [
+    # other methods...
+    'create_or_update_invoice',
+]
 

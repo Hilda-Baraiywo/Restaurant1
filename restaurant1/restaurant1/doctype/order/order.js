@@ -15,16 +15,16 @@ frappe.ui.form.on("Order", {
             },
         });
     },
-    onload: function(frm) {
-        frappe.call({
-            method: 'restaurant1.restaurant1.doctype.order.order.calculate_default_value',
-            callback: function(r)  {
-                if (r.message){
-                    frm.set_value('default_value_field', r.message);
-                }
-            },
-        });
-    },
+    // onload: function(frm) {
+    //     frappe.call({
+    //         method: 'restaurant1.restaurant1.doctype.order.order.calculate_default_value',
+    //         callback: function(r)  {
+    //             if (r.message){
+    //                 frm.set_value('default_value_field', r.message);
+    //             }
+    //         },
+    //     });
+    // },
     // validate: function(frm) {
     //     frappe.call({
     //         method: 'restaurant1.restaurant1.doctype.order.order.validate_order',
@@ -39,12 +39,13 @@ frappe.ui.form.on("Order", {
     //         }
     //     });
     // },
-        
+
     validate(frm) {
+        let customer_id = frm.doc.name
         frappe.call({
-            method: 'restaurant1.Services.rest.create_or_update_invoice',
+            method: 'restaurant1.restaurant1.doctype.order.order.create_or_update_invoice',
             args: {
-                'order': frm.doc
+                'customer_id': customer_id
             },
             callback: function (r) {
                 if (r.message) {
@@ -52,17 +53,14 @@ frappe.ui.form.on("Order", {
                 }
             }
         });
-    },
-
-    before_save(frm) {
         frappe.call({
             method: 'restaurant1.Services.rest.calculate_total',
             args: {
-                order_data: frm.doc
+                'customer_id': customer_id
             },
             callback: function (r) {
                 if (r.message) {
-                    frm.set_value('total_price', r.message.total_price);
+                    frm.set_value('total_amount', r.message);
                 }
             }
         });

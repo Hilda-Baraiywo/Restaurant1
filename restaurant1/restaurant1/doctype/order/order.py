@@ -8,20 +8,33 @@ class Order(Document):
 	pass
 
 @frappe.whitelist(allow_guest=True)
-def create_or_update_invoice(order):
-	customer_name = order.get('customer_name')
-	customer_email = order.get('customer_email')
+def create_or_update_invoice(customer_id = 'Aloo-01'):
+	print(f"\n\n\n success \n\n\n")
+	doc = frappe.get_doc("Order", customer_id)
+	customer_name = doc.customer_name
 
-	existing_customer = frappe.get_all("Customer", filters={"email_id": customer_email})
-	if existing_customer:
-		customer = frapp.get_doc("Customer", existing_customer[0].name)
-	else:
+	existing_customer = frappe.get_all("Customer", filters={"customer_name": customer_name})
+	if not existing_customer:
 		customer = frappe.get_doc({
 			'doctype': 'Customer',
 			'customer_name': customer_name,
-			'email_id': customer_email
+			'customer_type': "Individual",
 		})
-		customer.insert()
+		customer.insert(ignore_permissions=True)
+
+	if doc.order_item:
+		for order in doc.order_item:
+			existing_item = frappe.db.get_all("Item", {"name": order.name})
+			if not existing_item:
+				item = frappe.get_doc({
+					"doctype": "Item",
+					"item_code": order.name,
+					"item_name": order.name,
+					"item_group": "Consumable"
+				})
+				item.insert(ignore_permissions=True)
+				frappe.db.commit()
+	return "success"
 
 	existing_invoice = frappe.get_all("Sales Invoice", filters={"customer": customer.name, "status": "Draft"})
 	if existing_invoice:
@@ -58,11 +71,10 @@ def create_or_update_invoice(order):
 				"item_code": item_name,
 				"rate": price/quantity,
 				"amount": price,
-				"quantity": quantity,
+				"qty": quantity,
 			})
 		if not existing_invoice:
-			invoice.insert()
+			invoice.insert(ignore_permission=True)
 		else:
 			invoice.save()
 		frappe.db.commit()
-		

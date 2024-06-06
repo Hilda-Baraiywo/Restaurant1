@@ -1,12 +1,12 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "prompt",
+ "autoname": "format:{customer_name}-{##}",
  "creation": "2024-06-05 16:00:22.441409",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "customer",
+  "customer_name",
   "order_datetime",
   "order_item",
   "total_amount",
@@ -14,15 +14,8 @@
  ],
  "fields": [
   {
-   "fieldname": "customer",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Customer",
-   "reqd": 1
-  },
-  {
    "fieldname": "order_datetime",
-   "fieldtype": "Date",
+   "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Order DateTime",
    "reqd": 1
@@ -38,25 +31,29 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Pending\nConfirmed\nServed\nCancelled",
-   "reqd": 1
+   "options": "Pending\nConfirmed\nServed\nCancelled"
   },
   {
    "fieldname": "order_item",
-   "fieldtype": "Link",
-   "in_list_view": 1,
+   "fieldtype": "Table",
    "label": "Order Item",
-   "options": "Order Item",
+   "options": "Order Item"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer Name",
    "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-06 10:27:01.794527",
+ "modified": "2024-06-06 18:51:53.887683",
  "modified_by": "Administrator",
  "module": "Restaurant1",
  "name": "Order",
- "naming_rule": "Set by user",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

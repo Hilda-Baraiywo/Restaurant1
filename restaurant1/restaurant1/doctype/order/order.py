@@ -1,6 +1,5 @@
 # Copyright (c) 2024, Hilda Chepkirui and contributors
 # For license information, please see license.txt
-
 import frappe
 from frappe.model.document import Document
 
@@ -66,3 +65,4 @@ def create_or_update_invoice(order):
 		else:
 			invoice.save()
 		frappe.db.commit()
+		

@@ -39,7 +39,7 @@ frappe.ui.form.on("Order", {
     //         }
     //     });
     // },
-    
+        
     validate(frm) {
         frappe.call({
             method: 'restaurant1.Services.rest.create_or_update_invoice',

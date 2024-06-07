@@ -21,6 +21,9 @@ def create_or_update_invoice(customer_id = 'Aloo-01'):
 			'customer_type': "Individual",
 		})
 		customer.insert(ignore_permissions=True)
+		frappe.db.commit()
+	else:
+		customer = frappe.get_doc("Customer", existing_customer[0].name)
 
 	if doc.order_item:
 		for order in doc.order_item:
@@ -34,7 +37,6 @@ def create_or_update_invoice(customer_id = 'Aloo-01'):
 				})
 				item.insert(ignore_permissions=True)
 				frappe.db.commit()
-	return "success"
 
 	existing_invoice = frappe.get_all("Sales Invoice", filters={"customer": customer.name, "status": "Draft"})
 	if existing_invoice:
@@ -45,36 +47,48 @@ def create_or_update_invoice(customer_id = 'Aloo-01'):
 			"customer": customer.name,
 			"items": [],
 		})
-
-	for order_item in order.get('items'):
-		menu_item = order_item.get('menu_item')
-		quantity = order_item.get('quantity')
-		price = order_item.get('price')
-
-		item_name = menu_item
-		existing_item = frappe.get_all("Item", {"item_name": item_name}, {'item_name', 'item_group'})
-		if not existing_item:
-			item = frappe.get_doc({
-				"doctype": "Item",
-				"item_code": item_name,
-				"item_name": item_name,
-				"item_group": "Menu Items",
-				"description": "Menu items for restaurant"
-			})
-			item.insert()
-			frappe.db.commit()
-
-		existing_item_codes = [item.item_code for item in invoice.get("items")]
-
-		if item_name not in existing_item_codes:
-			invoice.append("items", {
-				"item_code": item_name,
-				"rate": price/quantity,
-				"amount": price,
-				"qty": quantity,
-			})
-		if not existing_invoice:
-			invoice.insert(ignore_permission=True)
-		else:
-			invoice.save()
+		invoice.insert(ignore_permissions=True)
 		frappe.db.commit()
+
+	existing_item_codes = [item.item_code for item in invoice.get("items")]
+	for order in doc.order_item:
+		if order.name not in existing_item_codes:
+			invoice.append("items", {
+				"item_code": order.name
+			})
+		invoice.save(ignore_permissions=True)
+		frappe.db.commit()
+	return "success"
+
+	# for order_item in order.get('items'):
+	# 	menu_item = order_item.get('menu_item')
+	# 	quantity = order_item.get('quantity')
+	# 	price = order_item.get('price')
+
+		# item_name = menu_item
+		# existing_item = frappe.get_all("Item", {"item_name": item_name}, {'item_name', 'item_group'})
+		# if not existing_item:
+		# 	item = frappe.get_doc({
+		# 		"doctype": "Item",
+		# 		"item_code": item_name,
+		# 		"item_name": item_name,
+		# 		"item_group": "Menu Items",
+		# 		"description": "Menu items for restaurant"
+		# # 	})
+		# 	item.insert()
+		# 	frappe.db.commit()
+
+		# existing_item_codes = [item.item_code for item in invoice.get("items")]
+
+		# if item_name not in existing_item_codes:
+		# 	invoice.append("items", {
+		# 		"item_code": item_name,
+		# 		"rate": price/quantity,
+		# 		"amount": price,
+		# 		"qty": quantity,
+		# 	})
+		# if not existing_invoice:
+		# 	invoice.insert(ignore_permission=True)
+		# else:
+		# 	invoice.save()
+		# frappe.db.commit()

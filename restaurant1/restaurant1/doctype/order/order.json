@@ -36,8 +36,9 @@
   {
    "fieldname": "order_item",
    "fieldtype": "Table",
-   "label": "Order Item",
-   "options": "Order Item"
+   "label": "Order Items",
+   "options": "Order Item",
+   "reqd": 1
   },
   {
    "fieldname": "customer_name",
@@ -49,7 +50,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-06 18:51:53.887683",
+ "modified": "2024-06-10 11:19:59.056396",
  "modified_by": "Administrator",
  "module": "Restaurant1",
  "name": "Order",

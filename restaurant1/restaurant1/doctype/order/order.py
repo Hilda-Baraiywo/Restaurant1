@@ -50,6 +50,8 @@ def create_or_update_invoice(customer_id='Aloo-01'):
 			if order.name not in existing_item_codes:
 				invoice.append("items", {
 					"item_code": order.name,
+					"rate": order_item[0].price,
+					"amount": order_item[0].price,
 					"qty": order.quantity if order.quantity and order.quantity > 0 else 1  # Ensure quantity is set and greater than zero
 					})
 		invoice.save(ignore_permissions=True)

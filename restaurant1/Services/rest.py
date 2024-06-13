@@ -22,7 +22,7 @@ def save_time():
     return current_time
 
 @frappe.whitelist(allow_guest=True)
-def get_menu_item_price(menu_item=''):
+def get_menu_item_price(menu_item='Pilau'):
     menu_item_doc = frappe.get_doc("Menu Item", menu_item)
     if menu_item_doc:
         return menu_item_doc.price
@@ -72,9 +72,6 @@ def update_or_create_order_item(order_id='Aloo-05', order_item_name='urqd9afjgm'
     except frappe.DoesNotExistError:
         print(f"Order Item {order_item_name} not found")
         frappe.throw(f"Order Item {order_item_name} not found",title="Not Found")
-    # except Exception as e:
-    #     print(f"Exception: {str(e)}")
-    #     frappe.throw(str(e))
     
 
 @frappe.whitelist(allow_guest=True)

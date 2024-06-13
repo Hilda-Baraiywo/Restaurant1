@@ -17,8 +17,7 @@
    "fieldname": "order_datetime",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Order DateTime",
-   "reqd": 1
+   "label": "Order DateTime"
   },
   {
    "fieldname": "total_amount",
@@ -34,23 +33,23 @@
    "options": "Pending\nConfirmed\nServed\nCancelled"
   },
   {
-   "fieldname": "order_item",
-   "fieldtype": "Table",
-   "label": "Order Items",
-   "options": "Order Item",
-   "reqd": 1
-  },
-  {
    "fieldname": "customer_name",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Customer Name",
    "reqd": 1
+  },
+  {
+   "fieldname": "order_item",
+   "fieldtype": "Table",
+   "label": "Order Items",
+   "options": "Order Item",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-10 11:19:59.056396",
+ "modified": "2024-06-12 12:37:00.904144",
  "modified_by": "Administrator",
  "module": "Restaurant1",
  "name": "Order",

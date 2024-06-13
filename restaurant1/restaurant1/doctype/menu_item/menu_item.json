@@ -1,7 +1,6 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{menu_item}",
  "creation": "2024-06-09 12:58:29.412106",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -47,11 +46,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-09 13:10:44.118424",
+ "modified": "2024-06-11 13:37:33.560911",
  "modified_by": "Administrator",
  "module": "Restaurant1",
  "name": "Menu Item",
- "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

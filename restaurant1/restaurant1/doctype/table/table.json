@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "TA.###",
+ "creation": "2024-06-15 17:18:42.232104",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "table_number",
+  "table_capacity",
+  "status",
+  "reservation_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "table_number",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Table Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Available\nOccupied\nCancelled\nCleaning\nReserved",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reservation_number",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Current Reservation",
+   "options": "Reservation"
+  },
+  {
+   "fieldname": "table_capacity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Table Capacity",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-06-15 21:04:33.137596",
+ "modified_by": "Administrator",
+ "module": "Restaurant1",
+ "name": "Table",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

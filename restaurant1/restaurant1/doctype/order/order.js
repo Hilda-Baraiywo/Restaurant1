@@ -9,22 +9,58 @@ frappe.ui.form.on("Order", {
     },
 
     refresh: function(frm){
+        loadOrderHistory(frm);
+
+        if (frm.doc.status === 'Pending'){
+            frm.add_custom_button(__('Confirm Order'), function(){
+                updateOrderStatus(frm.doc.name, 'Confirmed');
+            }).addClass('btn-primary');
+        }
+
+        if (frm.doc.status === 'Confirmed' || frm.doc.status === 'Preparing') {
+            frm.add_custom_button(__('Cancel Order'), function() {
+                updateOrderStatus(frm.doc.name, 'Cancelled');
+            }).addClass('btn-danger');
+        }
+
+        if (frm.doc.status == 'Confirmed') {
+            frm.add_custom_button(__('Start Preparation'), function(){
+                updateOrderStatus(frm.doc.name, 'Preparing');
+            }).addClass('btn-primary');
+        }
+
+        if (frm.doc.status === 'Preparing') {
+            frm.add_custom_button(__('Order Ready'), function(){
+                updateOrderStatus(frm.doc.name, 'Served');
+            }).addClass('btn-success');
+        }
         frm.add_custom_button(__('Create/Update Invoice'), function(){
-            frappe.call({
-                method: 'restaurant1.restaurant1.doctype.order.order.create_or_update_invoice',
-                args: {
-                    order_id: frm.doc.name
+            frappe.confirm(
+                'Are you sure you want to create or update the invoice?',
+                function(){
+                    frappe.call({
+                        method: 'restaurant1.restaurant1.doctype.order.order.create_or_update_invoice',
+                        args:{
+                            order_id: frm.doc.name,
+                            confirmed: true
+                        },
+                        callback: function(response) {
+                            if (response.message && response.message.success) {
+                                frappe.msgprint('Invoice created/updated successfully.');
+                                frm.reload_doc();
+                            }else if (response.message && response.message.error) {
+                                frappe.msgprint('Failed to create/update invoice: '+ response.message.error);
+                            }else if (response.message && response.message.confrim){
+                                frappe.msgprint('Invoice creation/update cancelled.');
+                            }
+                        }
+                    });
                 },
-                callback: function(response) {
-                    if (response.message === 'success') {
-                        frappe.msgprint('Invoice created/updated successfully.');
-                        frm.reload_doc();
-                    } else {
-                        frappe.msgprint('Failed to create/update invoice: ' + response.message.error);
-                    }
-                } 
-            });
-        }).addClass('btn-primary')
+                function(){
+                    frappe.msgprint('Invoice creation/update cancelled.');
+                }
+            );
+        }).addClass('btn-primary');
 
         frm.add_custom_button(__('Add Menu Item'), function(){
             frappe.prompt({
@@ -36,7 +72,7 @@ frappe.ui.form.on("Order", {
                 get_query: function(){
                     return {
                         filters: {
-                            'disabled': 0
+                            'is_available': 1
                         }
                     };
                 }
@@ -48,14 +84,33 @@ frappe.ui.form.on("Order", {
                     },
                     callback: function(r){ 
                         if (r.message){
-                            var child = frm.add_child('order_item');
-                            frappe.model.set_value(child.doctype, child.name, 'menu_item', values.menu_item);
-                            frappe.model.set_value(child.doctype, child.name, 'price', r.message);
+                            var existing_item =frm.doc.order_item.find(item => item.menu_item === values.menu_item);
+                            if (existing_item){
+                                frappe.model.set_value(existing_item.doctype, existing_item.name, 'quantity', existing_item.quantity + 1);
+                                frappe.model.set_value(existing_item.doctype, existing_item.name, 'total_price', r.message * existing_item.quantity);
+                            } else {
+                                var child = frm.add_child('order_item');
+                                frappe.model.set_value(child.doctype, child.name, 'menu_item', values.menu_item);
+                                frappe.model.set_value(child.doctype, child.name, 'price', r.message);
+                                frappe.model.set_value(child.doctype, child.name, 'quantity', 1);
+                                frappe.model.set_value(child.doctype, child.name, 'total_price', r.message);
+                            }
                             frm.refresh_field('order_item');
                         }
                     }
                 });
             }, __('Select Menu Item'), __('Add'));
+        }).addClass('btn-primary');
+
+        frm.add_custom_button(__('Add Order Note'), function(){
+            frappe.prompt({
+                label: 'Note',
+                fieldname: 'note',
+                fieldtype: 'Text',
+                reqd: true
+            }, function(values) {
+                addOrderNote(frm.doc.name, values.note);
+            }, 'Add Note', 'Add');
         }).addClass('btn-primary');
     },
 
@@ -63,7 +118,7 @@ frappe.ui.form.on("Order", {
         // Update item information based on order items
         frm.doc.order_item.forEach(function(item) {
             frappe.call({
-                method: 'restaurant1.restaurant1.doctype.order.order.update_or_create_item',
+                method: 'restaurant1.restaurant1.doctype.order.order.update_or_create_order_item',
                 args: {
                     order_id: frm.doc.name,
                     item_name: item.menu_item,
@@ -82,7 +137,7 @@ frappe.ui.form.on("Order", {
         });
     },
 
-    validate: function(frm) {
+    onload_post_render: function(frm) {
         frappe.call({
             method: 'restaurant1.Services.rest.save_time',
             callback: function(r) {
@@ -91,9 +146,69 @@ frappe.ui.form.on("Order", {
                 }
             }
         });
+        loadOrderHistory(frm);
     },   
 
 });
+
+function updateOrderStatus(order_id, status){
+    frappe.call({
+        method: 'restaurant1.Services.rest.update_order_status',
+        args: {
+            order_id: order_id,
+            status: status
+        },
+        callback: function(response){
+            if (response.message && response.message.status === 'success'){
+                cur_frm.reload_doc();
+            } else {
+                frappe.msgprint(`Failed to update order staus: ${response.message}`);
+            }
+        }
+    });
+}
+
+function addOrderNote(order_id, note){
+    frappe.call({
+        method: 'restaurant1.Services.rest.add_order_note',
+        args: {
+            order_id: order_id,
+            note: note
+        },
+        callback: function(response) {
+            if  (response.message && response.message.status === 'success') {
+                frappe.msgprint(`Note added to the Order ${order_id}`);
+                cur_frm.reload_doc();
+            } else {
+                frappe.msgprint('Failed to add note: ${response.message}');
+            }
+        }
+    });
+}
+
+function loadOrderHistory(frm) {
+    if (frm.doc.__islocal) return;
+    frappe.call({
+        method: 'frappe.client.get_list',
+        args: {
+            doctype: 'Order History',
+            filters: { 'parent': frm.doc.name },
+            fields: ['sataus', 'details', 'changed_by', 'changed_on'],
+            order_by: 'changed_on desc'
+        },
+        callback: function(message) {
+            if (response.message) {
+                var order_history = response.message;
+                var history_html = '<ul>';
+                order_history.forEach(function(hist) {
+                    history_html += `<li><b>${hist.status}</b>: ${hist.details} (by ${hist.changed_by} on ${hist.changed})</li>`;
+                });
+                history_html += '</ul>';
+                frm.dashboard.add_indicator('Order History', history_html, 'orange');
+            }
+        }
+    });
+}
 
 frappe.ui.form.on('Order Item', {
     menu_item: function(frm, cdt, cdn) {
@@ -131,62 +246,4 @@ function update_total_amount(frm) {
     frm.refresh_field('total_amount');
 }
 
-    // menu_item: function(frm, cdt, cdn) {
-    //     let item = locals[cdt][cdn];
-    //     // let menu_item = item.menu_item || '';
-
-    //     // if (menu_item && menu_item !== 'None') {
-    //     frappe.call({
-    //         method: 'restaurant1.Services.rest.update_or_create_order_item',
-    //         args: {
-    //             'order_id': frm.doc.name,
-    //             'order_item_name': item.name,
-    //             'menu_item': menu_item,
-    //             'quantity': item.quantity || 0
-    //         },
-    //         callback: function(r) {
-    //             if (r.message) {
-    //                 frappe.model.set_value(cdt, cdn, 'price', r.message.price);
-    //                 frappe.model.set_value(cdt, cdn, 'total_price', r.message.total_price);
-    //                 frappe.model.set_value(cdt, cdn, 'quantity', r.message.quantity);
-    //                 frm.set_value('total_amount', r.message.total_amount);
-    //             }
-    //         }
-    //     });
-    // },
-
-//     quantity: function(frm, cdt, cdn) {
-//         let item = locals[cdt][cdn];
-//         frappe.call({
-//             method: 'restaurant1.Services.rest.update_quantity',
-//             args: {
-//                 'order_item_name': item.name,
-//                 'quantity': item.quantity
-//             },
-//             callback: function(r) {
-//                 if (r.message) {
-//                     frappe.model.set_value(cdt, cdn, 'total_price', r.message.total_price);
-//                     frm.set_value('total_amount', r.message.total_amount);
-//                 }
-//             }
-//         });
-//     }
-
-// });
-// function update_total_amount(frm) {
-//     frappe.call({
-//         method: 'restaurant1.Services.rest.calculate_total_amount',
-//         args: {
-//             'order_id': frm.doc.name
-//         },
-//         callback: function(r) {
-//             if (r.message) {
-//                 frm.set_value('total_amount', r.message);
-//                 frm.refresh_field('total_amount');
-//             } else {
-//                 frappe.msgprint('Failed to update total amount');
-//             }
-//         }
-//     });
-// }
 

@@ -8,7 +8,7 @@ class Order(Document):
 	pass
 
 @frappe.whitelist(allow_guest=True)
-def create_or_update_invoice(order_id='Mwangi-06'):
+def create_or_update_invoice(order_id='Aloo-05', confirmed=False):
 	print(f"Processing order_id: {order_id}")
 	doc = frappe.get_doc("Order", order_id)
 
@@ -51,15 +51,8 @@ def create_or_update_sales_invoice(doc, customer):
 	else:
 		invoice = frappe.new_doc("Sales Invoice")
 		invoice.customer = customer.name
-	# 	({
-	# 		"doctype": "Sales Invoice",
-	# 		"customer": customer.name,
-	# 		"items": [],
-	# 	})
-	# 	invoice.insert(ignore_permissions=True)
-	# 	frappe.db.commit()
-	# 	print("Created new invoice")
 	return update_invoice_items(invoice, doc.order_item)
+
 def update_invoice_items(invoice, order_items):
 	existing_item_codes = [item.item_code for item in invoice.items]
 
@@ -90,12 +83,7 @@ def update_invoice_items(invoice, order_items):
 			except Exception as e:
 				frappe.log_error(f"Error inserting item: {e}")
 				continue
-			# ({
-			# 	"doctype": "Item",
-			# 	"item_code": order.name,
-			# 	"item_name": order.menu_item,
-			# 	"item_group": "Consumable"
-			# })
+
 		if order.name not in existing_item_codes:
 			print(f"Adding item to invoice: {order.name}")
 			invoice.append("items", {

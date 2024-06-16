@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class MenuItem(Document):
+class Reservation(Document):
 	pass

@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestOrderItem(FrappeTestCase):
+class TestTable(FrappeTestCase):
 	pass

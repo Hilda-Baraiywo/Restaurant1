@@ -10,7 +10,8 @@
   "order_datetime",
   "order_item",
   "total_amount",
-  "status"
+  "status",
+  "order_history"
  ],
  "fields": [
   {
@@ -30,7 +31,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Pending\nConfirmed\nServed\nCancelled"
+   "options": "Pending\nConfirmed\nServed\nCancelled\nPreparing"
   },
   {
    "fieldname": "customer_name",
@@ -46,11 +47,18 @@
    "label": "Order Items",
    "options": "Order Item",
    "reqd": 1
+  },
+  {
+   "fieldname": "order_history",
+   "fieldtype": "Table",
+   "label": "Order History",
+   "options": "Order History",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-13 13:23:44.383330",
+ "modified": "2024-06-14 12:57:43.300520",
  "modified_by": "Administrator",
  "module": "Restaurant1",
  "name": "Order",

@@ -1,0 +1,41 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-06-15 19:33:13.005034",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "table_number",
+  "capacity"
+ ],
+ "fields": [
+  {
+   "fieldname": "table_number",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Table Number",
+   "options": "Table",
+   "reqd": 1
+  },
+  {
+   "fieldname": "capacity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Capacity",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-06-15 19:34:17.734422",
+ "modified_by": "Administrator",
+ "module": "Restaurant1",
+ "name": "Table Group Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
